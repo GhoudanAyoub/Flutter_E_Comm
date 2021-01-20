@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/form_error.dart';
 import 'package:shop_app/helper/keyboard.dart';
+import 'package:shop_app/screens/complete_profile/complete_profile_screen.dart';
 import 'package:shop_app/screens/forgot_password/forgot_password_screen.dart';
 import 'package:shop_app/screens/login_success/login_success_screen.dart';
 
@@ -156,7 +158,7 @@ class _SignFormState extends State<SignForm> {
     await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email1,
         password: pass
-    ).whenComplete(() => Navigator.pushNamed(context, LoginSuccessScreen.routeName));
+    ).whenComplete(() => checkClientData());
   } on FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
       print('No user found for that email.');
@@ -165,5 +167,14 @@ class _SignFormState extends State<SignForm> {
     }
   }}
 
+  checkClientData() {
+    FirebaseDatabase.instance.reference().child("ShopAppUsers").once().then((DataSnapshot snapshot) {
+      if(snapshot.value!=null)
+        Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+      else
+        Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+
+    });
+  }
 
 }

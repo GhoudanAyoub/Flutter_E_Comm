@@ -55,8 +55,10 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             text: "continue",
             press: () {
               if (_formKey.currentState.validate()) {
-                users.createRecord(users( firstName: this.firstName, lastName: this.lastName,
-                    phoneNumber: this.phoneNumber, address: this.address));
+                FirebaseDatabase.instance.reference().child("ShopAppUsers")
+                    .set(users( firstName: this.firstName, lastName: this.lastName,
+                    phoneNumber: this.phoneNumber, address: this.address))
+                    .whenComplete(() => Navigator.pushNamed(context, OtpScreen.routeName));
               }
             },
           ),

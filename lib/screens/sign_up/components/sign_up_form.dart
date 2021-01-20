@@ -166,8 +166,11 @@ class _SignUpFormState extends State<SignUpForm> {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email1,
           password: pass
-      );
-      Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+      ).whenComplete(() => {
+        Navigator.pushNamed(context, CompleteProfileScreen.routeName),
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Congratulation Your Account Created')))
+    });
+
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
