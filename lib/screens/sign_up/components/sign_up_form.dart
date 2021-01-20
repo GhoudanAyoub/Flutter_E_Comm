@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/default_button.dart';
 import 'package:shop_app/components/form_error.dart';
+import 'package:shop_app/firebaseService/FirebaseService.dart';
 import 'package:shop_app/screens/complete_profile/complete_profile_screen.dart';
 
 import '../../../constants.dart';
@@ -16,6 +17,8 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController _emailContoller = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
   String email;
   String password;
   String conform_password;
@@ -51,9 +54,13 @@ class _SignUpFormState extends State<SignUpForm> {
           SizedBox(height: getProportionateScreenHeight(40)),
           DefaultButton(
             text: "Continue",
-            press: () {
+            press: () async {
               if (_formKey.currentState.validate()) {
-                create(email,password);
+                dynamic result =  await FirebaseService.create(_emailContoller.text,_passwordController.text,context);
+                if (result != null){
+                  Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+                  Scaffold.of(context).showSnackBar(SnackBar(content: Text('Congratulation Your Account Created')));
+                }
               }
             },
           ),
@@ -97,6 +104,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
   TextFormField buildPasswordFormField() {
     return TextFormField(
+      controller: _passwordController,
       obscureText: true,
       onSaved: (newValue) => password = newValue,
       onChanged: (value) {
@@ -130,6 +138,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
   TextFormField buildEmailFormField() {
     return TextFormField(
+      controller: _emailContoller,
       keyboardType: TextInputType.emailAddress,
       onSaved: (newValue) => email = newValue,
       onChanged: (value) {
@@ -161,24 +170,4 @@ class _SignUpFormState extends State<SignUpForm> {
     );
   }
 
-  Future<void> create(String email1,String pass) async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email1,
-          password: pass
-      ).whenComplete(() => {
-        Navigator.pushNamed(context, CompleteProfileScreen.routeName),
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Congratulation Your Account Created')))
-    });
-
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
 }

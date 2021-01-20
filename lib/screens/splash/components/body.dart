@@ -71,11 +71,12 @@ class _BodyState extends State<Body> {
                     Spacer(flex: 3),
                     DefaultButton(
                       text: "Continue",
-                      press: () {
-                        if (CurrentClient!=null)
+                      press: ()  {
+                        if(FirebaseAuth.instance.currentUser==null){
                           Navigator.pushNamed(context, SignInScreen.routeName);
-                        else
+                        }else{
                           Navigator.pushNamed(context, HomeScreen.routeName);
+                        }
                       },
                     ),
                     Spacer(),

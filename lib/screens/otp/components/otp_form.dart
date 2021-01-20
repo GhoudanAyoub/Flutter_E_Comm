@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/default_button.dart';
 import 'package:shop_app/size_config.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../home/home_screen.dart';
 
 import '../../../constants.dart';
 
@@ -24,6 +26,25 @@ class _OtpFormState extends State<OtpForm> {
     pin2FocusNode = FocusNode();
     pin3FocusNode = FocusNode();
     pin4FocusNode = FocusNode();
+    getPhoneCode();
+  }
+
+  Future<void> getPhoneCode() async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+    phoneNumber: FirebaseAuth.instance.currentUser.phoneNumber,
+    verificationCompleted: (PhoneAuthCredential credential) {},
+    verificationFailed: (FirebaseAuthException e) {
+      if (e.code == 'invalid-phone-number') {
+        print('The provided phone number is not valid.');
+      }
+    },
+    codeSent: (String verificationId, int resendToken)async  {
+      String smsCode = 'xxxx';
+      PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider
+          .credential(verificationId: verificationId, smsCode: smsCode);
+    },
+    codeAutoRetrievalTimeout: (String verificationId) {},
+    );
   }
 
   @override
@@ -109,10 +130,11 @@ class _OtpFormState extends State<OtpForm> {
           SizedBox(height: SizeConfig.screenHeight * 0.15),
           DefaultButton(
             text: "Continue",
-            press: () {},
+            press: () {Navigator.pushNamed(context, HomeScreen.routeName);},
           )
         ],
       ),
     );
   }
+
 }

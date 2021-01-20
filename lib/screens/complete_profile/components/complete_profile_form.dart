@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/default_button.dart';
 import 'package:shop_app/components/form_error.dart';
+import 'package:shop_app/firebaseService/FirebaseService.dart';
 import 'package:shop_app/models/users.dart';
 import 'package:shop_app/screens/otp/otp_screen.dart';
 
@@ -17,6 +18,10 @@ class CompleteProfileForm extends StatefulWidget {
 class _CompleteProfileFormState extends State<CompleteProfileForm> {
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
+  TextEditingController _firstNameContoller = TextEditingController();
+  TextEditingController _lastNameController = TextEditingController();
+  static TextEditingController _phoneNumberContoller = TextEditingController();
+  TextEditingController _addressController = TextEditingController();
   String firstName;
   String lastName;
   String phoneNumber;
@@ -55,10 +60,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             text: "continue",
             press: () {
               if (_formKey.currentState.validate()) {
-                FirebaseDatabase.instance.reference().child("ShopAppUsers")
-                    .set(users( firstName: this.firstName, lastName: this.lastName,
-                    phoneNumber: this.phoneNumber, address: this.address))
-                    .whenComplete(() => Navigator.pushNamed(context, OtpScreen.routeName));
+                FirebaseService.SaveNewUserData(users( firstName: this._firstNameContoller.text, lastName: this._lastNameController.text,
+                    phoneNumber: _phoneNumberContoller.text, address: this._addressController.text),context);
               }
             },
           ),
@@ -69,6 +72,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
 
   TextFormField buildAddressFormField() {
     return TextFormField(
+      controller: _addressController,
       onSaved: (newValue) => address = newValue,
       onChanged: (value) {
         if (value.isNotEmpty) {
@@ -86,8 +90,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
       decoration: InputDecoration(
         labelText: "Address",
         hintText: "Enter your phone address",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon:
             CustomSurffixIcon(svgIcon: "assets/icons/Location point.svg"),
@@ -97,6 +99,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
 
   TextFormField buildPhoneNumberFormField() {
     return TextFormField(
+      controller: _phoneNumberContoller,
       keyboardType: TextInputType.phone,
       onSaved: (newValue) => phoneNumber = newValue,
       onChanged: (value) {
@@ -115,8 +118,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
       decoration: InputDecoration(
         labelText: "Phone Number",
         hintText: "Enter your phone number",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Phone.svg"),
       ),
@@ -125,12 +126,11 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
 
   TextFormField buildLastNameFormField() {
     return TextFormField(
+      controller: _lastNameController,
       onSaved: (newValue) => lastName = newValue,
       decoration: InputDecoration(
         labelText: "Last Name",
         hintText: "Enter your last name",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
       ),
@@ -139,6 +139,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
 
   TextFormField buildFirstNameFormField() {
     return TextFormField(
+      controller: _firstNameContoller,
       onSaved: (newValue) => firstName = newValue,
       onChanged: (value) {
         if (value.isNotEmpty) {
