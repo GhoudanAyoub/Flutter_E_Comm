@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/form_error.dart';
@@ -74,10 +75,8 @@ class _SignFormState extends State<SignForm> {
             text: "Continue",
             press: () {
               if (_formKey.currentState.validate()) {
-                _formKey.currentState.save();
-                // if all are valid then go to success screen
                 KeyboardUtil.hideKeyboard(context);
-                Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+                sign(email,password);
               }
             },
           ),
@@ -151,4 +150,20 @@ class _SignFormState extends State<SignForm> {
       ),
     );
   }
+
+  Future<void> sign(String email1,String pass) async {
+    try {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email1,
+        password: pass
+    ).whenComplete(() => Navigator.pushNamed(context, LoginSuccessScreen.routeName));
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      print('No user found for that email.');
+    } else if (e.code == 'wrong-password') {
+      print('Wrong password provided for that user.');
+    }
+  }}
+
+
 }

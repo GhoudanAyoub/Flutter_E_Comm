@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_app/size_config.dart';
 
+
+final String CurrentClient = FirebaseAuth.instance.currentUser.uid;
 const kPrimaryColor = Color(0xFFFF4444);
 const kPrimaryLightColor = Color(0xFFFFECDF);
 const kPrimaryGradientColor = LinearGradient(

@@ -1,7 +1,9 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/default_button.dart';
 import 'package:shop_app/components/form_error.dart';
+import 'package:shop_app/models/users.dart';
 import 'package:shop_app/screens/otp/otp_screen.dart';
 
 import '../../../constants.dart';
@@ -53,7 +55,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             text: "continue",
             press: () {
               if (_formKey.currentState.validate()) {
-                Navigator.pushNamed(context, OtpScreen.routeName);
+                users.createRecord(users( firstName: this.firstName, lastName: this.lastName,
+                    phoneNumber: this.phoneNumber, address: this.address));
               }
             },
           ),
@@ -158,4 +161,6 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
       ),
     );
   }
+
 }
+

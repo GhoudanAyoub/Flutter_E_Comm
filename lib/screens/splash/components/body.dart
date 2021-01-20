@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_app/constants.dart';
+import 'package:shop_app/screens/home/home_screen.dart';
 import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
 import 'package:shop_app/size_config.dart';
 
@@ -70,7 +72,10 @@ class _BodyState extends State<Body> {
                     DefaultButton(
                       text: "Continue",
                       press: () {
-                        Navigator.pushNamed(context, SignInScreen.routeName);
+                        if (CurrentClient!=null)
+                          Navigator.pushNamed(context, SignInScreen.routeName);
+                        else
+                          Navigator.pushNamed(context, HomeScreen.routeName);
                       },
                     ),
                     Spacer(),
