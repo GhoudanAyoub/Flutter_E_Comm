@@ -6,6 +6,7 @@ import 'package:shop_app/models/users.dart';
 import 'package:shop_app/screens/complete_profile/complete_profile_screen.dart';
 import 'package:shop_app/screens/login_success/login_success_screen.dart';
 import 'package:shop_app/screens/otp/otp_screen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 
 class FirebaseService{
@@ -13,11 +14,30 @@ class FirebaseService{
 static final CollectionReference userCollection = FirebaseFirestore.instance
     .collection('ShopAppUsers');
 static UserCredential userCredential;
+static final String Client_displayName= FirebaseAuth.instance.currentUser.displayName;
+
 
 // Auth System
+ static Future signInWithGoogle(BuildContext context) async {
+    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final GoogleAuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+    final User user = userCredential.user;
+    SaveNewUserData(users(firstName: user.displayName, lastName: null, phoneNumber: user.phoneNumber, address: null),context);
+    assert(FirebaseAuth.instance.currentUser.uid == user.uid);
+
+    return user;
+ }
+
+ //*****************************
 static Future create(String email1,String pass,BuildContext context) async {
   try {
-    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+    userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email1,
         password: pass
     ).catchError((onError)=>Scaffold.of(context).showSnackBar(SnackBar(content: Text("$onError"))));
@@ -51,16 +71,21 @@ static Future sign(String e,String pass,BuildContext context) async {
 }
 
 static checkClientData(BuildContext context) async {
-  await FirebaseDatabase.instance.reference().child("ShopAppUsers").once().then((DataSnapshot snapshot) {
-    if(snapshot.value!=null)
-      Navigator.pushNamed(context, LoginSuccessScreen.routeName);
-    else
-      Navigator.pushNamed(context, CompleteProfileScreen.routeName);
-  });
+  await FirebaseFirestore.instance.collection("ShopAppUsers")
+  .doc(Client_displayName.toLowerCase())
+  .get()
+      .catchError((onError)=>Scaffold.of(context).showSnackBar(SnackBar(content: Text("$onError"))))
+      .then((snapshot) => {
+        if(snapshot.exists)
+          Navigator.pushNamed(context, LoginSuccessScreen.routeName)
+        else
+          Navigator.pushNamed(context, CompleteProfileScreen.routeName)
+      });
+
 }
 
 static Future<void> SaveNewUserData(users user,BuildContext context) async{
-  return await userCollection.doc(user.firstName+" "+user.lastName)
+  return await userCollection.doc(Client_displayName.toLowerCase())
   .set({
     "firstName":user.firstName,
     "lastName":user.lastName,
