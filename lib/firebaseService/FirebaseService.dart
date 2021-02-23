@@ -13,6 +13,8 @@ class FirebaseService{
 
 static final CollectionReference userCollection = FirebaseFirestore.instance
     .collection('ShopAppUsers');
+static final CollectionReference productCollection = FirebaseFirestore.instance
+    .collection('ShopAppProduct');
 static UserCredential userCredential;
 static final String Client_displayName= FirebaseAuth.instance.currentUser.displayName;
 
@@ -34,7 +36,6 @@ static final String Client_displayName= FirebaseAuth.instance.currentUser.displa
     return user;
  }
 
- //*****************************
 static Future create(String email1,String pass,BuildContext context) async {
   try {
     userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -96,11 +97,18 @@ static Future<void> SaveNewUserData(users user,BuildContext context) async{
 }
 
 Future getData() async {
-  List itemlist = [];
+  List userList = [];
   return await userCollection.get().then((value) => {
-    value.docs.forEach((element) { itemlist.add(element.data);})
+    value.docs.forEach((element) { userList.add(element.data);})
   });
 }
+
+Future geProduct() async {
+    List productList = [];
+    return await productCollection.get().then((value) => {
+      value.docs.forEach((element) { productList.add(element.data);})
+    });
+ }
 
 
 }

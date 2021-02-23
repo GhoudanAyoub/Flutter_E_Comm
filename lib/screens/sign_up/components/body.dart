@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/socal_card.dart';
 import 'package:shop_app/constants.dart';
+import 'package:shop_app/firebaseService/FirebaseService.dart';
+import 'package:shop_app/screens/home/home_screen.dart';
 import 'package:shop_app/size_config.dart';
 
 import 'sign_up_form.dart';
@@ -30,15 +32,21 @@ class Body extends StatelessWidget {
                   children: [
                     SocalCard(
                       icon: "assets/icons/google-icon.svg",
-                      press: () {},
+                      press: () async {
+                        dynamic result = await FirebaseService.signInWithGoogle(context);
+
+                        if(result!=null){
+                          Navigator.pushNamed(context, HomeScreen.routeName);
+                        }
+                      },
                     ),
                     SocalCard(
                       icon: "assets/icons/facebook-2.svg",
-                      press: () {},
+                      press: () {Scaffold.of(context).showSnackBar(SnackBar(content: Text("Coming Soon")));},
                     ),
                     SocalCard(
                       icon: "assets/icons/twitter.svg",
-                      press: () {},
+                      press: () {Scaffold.of(context).showSnackBar(SnackBar(content: Text("Coming Soon")));},
                     ),
                   ],
                 ),
